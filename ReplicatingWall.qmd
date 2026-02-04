@@ -1,0 +1,205 @@
+---
+title: "Replicating Wall"
+format: html
+---
+
+## package setup
+```{r}
+library(sf) ## for spatial functionality
+#library(tidycensus) ## for state boundaries-- actually we can get from spData imported by spatial reg
+library(spatialreg) ## for car and sar
+library(dplyr) ## for data cleaning
+library(ggplot2) ## for plotting
+library(spdep) ## for contiguity/weight matrix
+library(car) ## for regression
+library(olsrr) ## for ordinary least squares
+library(tidyverse) ## group of packages for better visualization
+library(scales) # for scaling color breaks
+```
+
+## Read in the data
+
+```{r}
+wall_data <- read.csv("wall_2004_dataset.csv")
+
+wall_data <- 
+  wall_data %>%
+  filter(!(name %in% c("District of Columbia", "Alaska", "Hawaii", "USA"))) ## analysis does not include DC, AK, or HI (it could include one though! q: which one and what important thing about our model spec would change?) ## also has total USA
+
+```
+
+
+## Visualize the data non-spatially
+
+
+
+## Fit iid model
+
+```{r}
+wall_data$perc_elig_2 <- wall_data$perc_elig^2
+fit_iid <- lm(verbal ~ perc_elig + perc_elig_2, data = wall_data)
+summary(fit_iid) ## coefficients match, but standard errors (of parameters and resids) do not. 
+
+logLik(fit_iid) ## matches, so I bet S+ just estimated standard errors differently? someone ask dr walker maybe
+```
+
+## Set up geometry
+
+```{r}
+# if using tidycensus-- leaving in case someone wants to do a different analysis with census data
+# state_laea %>%
+#   inner_join(fips_codes %>% select(state, state_code, state_name), 
+#              join_by(GEOID == state_code))
+
+wall_sp = us_states %>%## contains boundaries of contiguous 48 + DC
+  inner_join(wall_data, join_by(NAME == name)) 
+
+
+wall_sp_ordered = wall_sp %>% arrange(GEOID) %>% 
+  mutate(GEOID = seq(from = 1, to = 48, by = 1)) 
+
+
+wall_sp_ordered %>% 
+  ggplot(aes(fill = verbal, label = "a")) + geom_sf() +
+  scale_fill_gradientn(name = "Verbal",
+    colors = c("white", "lightgray","gray", "darkgray", "black"),
+    values = rescale(c(0, 506, 530, 565, 1000))) +
+  labs(title = "Average SAT Verbal Scores for 1999")
+
+```
+
+
+
+
+## Compute weight matrix based on geometry
+
+```{r}
+
+## vignette("nb_sf")
+nb_us <- poly2nb(wall_sp_ordered, queen = TRUE) ### 💅 👑
+#nb_us[] # states are alphabetical, numbered 1-48
+
+```
+
+## Assess residuals for spatial autocorr
+
+```{r}
+moran.test(fit_iid$residuals, listw = nb2listw(nb_us, style = "W"))
+# p-value of <0.001 indicates strong spatial autocorrelation under Moran I test
+```
+
+## Fit SAR model
+```{r}
+
+fit_SAR <- spatialreg::spautolm(verbal~perc_elig + perc_elig^2, 
+                                data = wall_sp_ordered, 
+                                listw = nb2listw(nb_us, style = "W"),
+                                family = "SAR")
+
+summary(fit_SAR) ## doesn't match-- weights or code difference like (I suspect) with iid?
+
+```
+
+
+## Fit CAR model
+```{r}
+
+fit_CAR <- spatialreg::spautolm(verbal~perc_elig + perc_elig^2, 
+                                data = wall_sp_ordered, 
+                                listw = nb2listw(nb_us, style = "W"),
+                                family = "CAR") 
+
+## remind me to discuss the warning
+
+summary(fit_CAR) ## doesn't match-- weights or code difference like (I suspect) with iid?
+
+```
+
+
+## Map the fitted values
+
+### IID Model
+
+```{r}
+
+iid_fits = data.frame(
+  fitted = fitted(fit_iid),
+  residuals = residuals(fit_iid)
+)
+
+ggplot(data = iid_fits, aes(x = fitted, y = residuals)) + geom_point()
+
+```
+
+
+
+### SAR Model
+
+```{r}
+
+SAR_fits = data.frame(
+  fitted = fitted(fit_SAR),
+  residuals = residuals(fit_SAR)
+)
+
+ggplot(data = SAR_fits, aes(x = fitted, y = residuals)) + geom_point()
+```
+
+
+
+### CAR Model
+
+```{r}
+
+CAR_fits = data.frame(
+  fitted = fitted(fit_CAR),
+  residuals = residuals(fit_CAR)
+)
+
+ggplot(data = CAR_fits, aes(x = fitted, y = residuals)) + geom_point()
+```
+
+
+
+## Map Visualization of Fits
+
+
+```{r}
+# ChatGPT code (needs cleaning)
+
+
+nb <- poly2nb(as(wall_sp_ordered, "Spatial"), queen = TRUE)
+lw <- nb2listw(nb, style = "W", zero.policy = TRUE)
+
+# extract lambda (spatial parameter)
+lambda_hat <- coef(fit_SAR)[["lambda"]]
+if (is.na(lambda_hat)) lambda_hat <- fit_SAR$lambda  # fallback if stored differently
+
+# residuals (innovations)
+e_hat <- residuals(fit_SAR)
+
+# convert listw to matrix
+W <- listw2mat(lw)
+I <- diag(nrow(W))
+
+# spatially structured component
+u_hat <- as.numeric(solve(I - lambda_hat * W, e_hat))
+
+wall_sp_ordered$small_scale <- u_hat
+
+
+ggplot(wall_sp_ordered) +
+  geom_sf(aes(fill = small_scale), color = "black", linewidth = 0.15) +
+  coord_sf(datum = NA) +
+  scale_fill_gradient2(
+    name = "Small-scale\nspatial structure",
+    low = "white", mid = "gray", high = "black", midpoint = 0
+  ) +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+```
+
+
+
+
