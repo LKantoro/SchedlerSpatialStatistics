@@ -196,6 +196,8 @@ rbind(fit_iid$coefficients, se_betas_wall)
 
 #### Update i.i.d. model in `estimates_and_sources.csv`
 
+WORK ON THIS: Need to add in mean square error (currently is NA, should be a value from `fit_iid`.)
+
 ```{r}
 
 ## add some code to verify the match
@@ -335,6 +337,24 @@ summary(fit_CAR) ## doesn't match-- weights or code difference like (I suspect) 
 
 ```
 
+### Reproduce Exponential VGM model
+
+```{r}
+#| label: wall-vgm
+
+wall_ests |>
+  dplyr::filter(Model == "expo_vg") |>
+  select("Parameter", "Estimate", "Standard.error") 
+```
+
+#### Initial attempt 
+
+```{r}
+#| label: repro-vg
+
+## WORK ON THIS
+```
+
 ## Map the fitted values
 
 WORK ON THIS: the three visuals below are diagnostic checks, not maps of fitted values. Maybe separate out diagnostic checks.
@@ -375,6 +395,7 @@ CAR_fits = data.frame(
 
 ggplot(data = CAR_fits, aes(x = fitted, y = residuals)) + geom_point()
 ```
+
 
 ## Map Visualization of Fits
 
