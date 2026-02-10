@@ -1,0 +1,413 @@
+---
+title: "Reroducing Wall"
+author:
+  - name: Julia Schedler
+    affiliations:
+      - name: Cal Poly SLO
+        department: Statistics Department
+  - name: Lucas R. Kantorowski
+    affiliations:
+      - name: Cal Poly SLO
+        department: Statistics Department
+format: 
+  html:
+    toc: true
+    
+bibliography: data/citations_for_reproduction.bib
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| code-fold: true
+library(sf) ## for spatial functionality
+#library(tidycensus) ## for state boundaries-- actually we can get from spData imported by spatial reg
+library(spatialreg) ## for car and sar
+library(dplyr) ## for data cleaning
+library(ggplot2) ## for plotting
+library(spdep) ## for contiguity/weight matrix
+library(car) ## for regression
+library(olsrr) ## for ordinary least squares
+library(tidyverse) ## group of packages for better visualization
+library(scales) # for scaling color breaks
+library(lubridate) ## ymd function
+
+### wall estimates from paper for comparison 
+
+estimation_records <- read.csv("data/estimates_and_sources.csv")
+## extract only the values from paper (other rows we will write as we replicate)
+wall_ests<- estimation_records |> 
+  dplyr::filter(source == "wall" & data.collection == "transcription")
+```
+
+## Goal
+
+Reproduce the analyses in @wall_close_2004 table:
+
+![Screenshot of Table 1 from Wall 2004, showing parameter estimates for SAR, CAR, Exponential Variogram, and I.I.D. models.](data/images/table_1_screenshot.png)
+
+## Read in the data
+
+WORK ON THIS: Add a bit of detail about the data, like a bulleted list of data descriptions.
+
+```{r}
+#| label: read-data
+wall_data <- read.csv("data/wall_2004_dataset.csv")
+
+wall_data <- 
+  wall_data %>%
+  filter(!(name %in% c("District of Columbia", "Alaska", "Hawaii", "USA"))) ## analysis does not include DC, AK, or HI (it could include one though! q: which one and what important thing about our model spec would change?) ## also has total USA
+```
+
+## Visualize the data non-spatially
+
+```{r}
+## Replicate fig 1
+## histograms of each variable
+## scatterplots 
+
+## WORK ON THIS
+```
+
+## Try to Reproduce Wall paper
+
+The spreadsheet `estimates_and_sources.csv` contains all the values from Table 1 in the Wall paper. This was read in at the top of the file as `estimation_records`. 
+
+### Reproduce IID Model
+The code below outputs the values for the i.i.d. model. 
+```{r}
+
+### wall estimates from paper for comparison 
+
+## report the standard error estimates
+wall_ests |>
+  dplyr::filter(Model == "iid") |>
+  select("Parameter", "Estimate", "Standard.error") 
+```
+
+#### Initial attempt
+
+Estimated standard errors do not match (see above).
+
+```{r}
+#| label: fit-iid
+wall_data$perc_elig_2 <- wall_data$perc_elig^2
+fit_iid <- lm(verbal ~ perc_elig + I(perc_elig^2), data = wall_data)
+summary(fit_iid) ## coefficients match, but standard errors (of parameters and resids) do not. 
+
+
+logLik(fit_iid) ## matches
+```
+
+
+
+#### Adjusting R estimates to match Wall paper
+
+The formula to compute standard errors for a fitted regression model $\hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 + \dots + \hat{\beta}_k X_k$ is:
+
+$$
+\text{SE}(\hat{\beta_i}) = \sqrt{s^2 (X^TX)^{-1}}
+$$
+
+$X^TX$ is just the design matrix/data, so that should be the same between the Wall paper and our approach here with `lm` in R. So, perhaps the discrepancy is in that $s^2$ term.
+
+Recall that here, $s^2$ is an estimate of the variance of the true errors $\varepsilon \sim N(0, \sigma^2)$, where $Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k + \varepsilon$).
+
+There are several different ways to compute this estimate: the Maximum Likelihood Estimate (MLE), and the bias-adjusted MLE.
+
+Table 1 (Wall) reports the biased MLE of the variance of the errors:
+
+$$
+s^2_{\text{wall}} = s^2_{biased} = \frac{SSE}{n}%
+$$ While the `summary` outputs the bias-adjusted MLE:
+
+$$
+s^2_{\tt{lm}\text{ output}} = s^2_{unbiased} = \frac{SSE}{n -k-1}
+$$
+
+The code below computes the (biased) MLE of $\sigma^2$ and then uses it to re-calculate $\text{SE}(\hat{\beta_i})$, which gives us values that match the wall paper.
+
+::: callout-note
+#### MLEs and Bias
+
+When we set up some parametric model (like $x_i \sim N(\mu, \sigma^2)$ i.i.d. for all $i$), we inevitably want to find formulas that use the sample data, or *estimators* that will allow us to compute *estimates of unknown parameters.*
+
+One method to derive these estimators is the method of maximum likelihood estimation.
+
+Once we have derived such a formula, we can see whether it is unbiased. For example, if I have some arbitrary formula/estimator $\hat{\theta}$ that is supposed to estimate an unknown quantity $\theta$, I might ask whether the following equality holds:
+
+$$
+\mathbb{E}(\hat{\theta}) = \theta
+$$
+
+In other words, if I take all possible random samples and compute estimates using the formula $\hat{\theta}$ for all of those samples, with the average of the estimates equal the underlying true value $\theta$?
+
+If the equality holds, then we say that the estimator is unbiased. Note that MLEs are not guaranteed to be unbiased, though they do have lots of nice properties.
+
+#### Unbiased MLE example
+
+Equations 7 and 8 from the ["Proof: Maximum likelihood estimation for the univariate Gaussian" page of the Book of Statistical Proofs](https://statproofbook.github.io/P/ug-mle) show the derivation of the MLE of $\mu$ from a random sample of $x_1, \dots, x_n$ where $x_i \sim N(\mu, \sigma^2)$. This derivation results in the following *estimator* of the unknown parameter $\mu$:
+
+$$
+\hat{\mu}_{\text{MLE}}= \frac{\sum_{i = 1}^n x_i}{n}
+$$
+
+Of course, we usually use the notation $\bar{x}$ for the formula above. Is $\hat{\mu}_{\text{MLE}}$ unbiased for $\mu$? Well,
+
+$$
+\mathbb{E}\left ( \hat{\mu}_{\text{MLE}} \right ) = \mathbb{E}\left ( \frac{\sum_{i = 1}^n x_i}{n} \right ) = \frac{1}{n}\sum_{i = 1}^n \mathbb{E}(x_i) = \frac{1}{n} \cdot n \mu = \mu
+$$
+
+So $\bar{x} = \hat{\mu}_{\text{MLE}}$ is unbiased for $\mu$.
+
+#### Biased MLE example
+
+Equations 9 and 10 from the ["Proof: Maximum likelihood estimation for the univariate Gaussian" page of the Book of Statistical Proofs](https://statproofbook.github.io/P/ug-mle) show the derivation of the MLE of $\sigma^2$ from a random sample of $x_1, \dots, x_n$ where $x_i \sim N(0, \sigma^2)$. This derivation results in the following *estimator* of the unknown parameter $\sigma^2$:
+
+$$
+\hat{\sigma}^2_{\text{MLE}} = \frac{\sum_{i = 1}^n(x_i - \bar{x})^2}{n}
+$$
+
+Is $\hat{\sigma}^2_{\text{MLE}}$ unbiased for $\sigma^2$? We need to compute the expected value of the estimator. You can ask your 426 professor for the steps, but we end up with:
+
+$$
+\mathbb{E}\left( \frac{\sum_{i = 1}^n(x_i - \bar{x})^2}{n} \right ) = \frac{(n-1)\cdot\sigma^2}{ n} \ne \sigma^2
+$$
+
+Note that If $n$ is very large, then $(n-1)/n$ is very close to 1. This is how `NumPy` gets away with using the biased estimator of sample standard deviation/variance by default. See this [Stack Overflow Answer](https://stackoverflow.com/questions/27600207/why-does-numpy-std-give-a-different-result-to-matlab-std#:~:text=Unless%20told%20otherwise,N%20%2D%20ddof%20instead.).
+
+#### Bias-adjusting the MLE
+
+Note that if we adjust the MLE estimate of $\sigma^2$ by dividing by $n-1$ instead of $n$ we can obtain an unbiased estimator. Try to show this yourself!
+:::
+
+```{r}
+#| label: biased-mle-calc
+## compute the bias-unadjusted MLE
+mle_sigma_sq <- sum(fit_iid$residuals^2)/(nrow(wall_data))
+
+## compute standard errors manually
+X <- model.matrix(fit_iid)
+se_betas_wall <- sqrt(diag(solve(t(X)%*%X))*mle_sigma_sq)
+
+## print out manually computed wall estimates
+rbind(fit_iid$coefficients, se_betas_wall)
+```
+
+#### Update i.i.d. model in `estimates_and_sources.csv`
+
+```{r}
+
+## add some code to verify the match
+## FIXME ###
+
+estimates <- c(fit_iid$coefficients, NA, NA, mle_sigma_sq, NA, logLik(fit_iid) 
+)
+std_errs <- c(se_betas_wall, rep(-212, times = 5)) ## no se estimates for other params
+
+## write the estimates to file:
+## Create a data frame with the new estimates
+new_estimates <- data.frame(
+  date = rep(format(today(), "%m/%d/%y"), times = length(estimates)),
+  Model = rep("iid", times = length(estimates)),
+  source = rep("cp_spatial", times = length(estimates)),
+  data.collection = rep("replication", times = length(estimates)),
+  Parameter = c("beta_0", "beta_1", "beta_2", "var_param_1", "var_param_2", 
+                "var_param_3", "var_param_4", "log_lik"),
+  Estimate = estimates,
+  Standard.error = std_errs
+)
+
+## Update the estimation_records by joining and updating
+estimation_records <- estimation_records |>
+  rows_update(new_estimates, 
+              by = c("Model", "source", "data.collection", "Parameter"),
+              unmatched = "ignore")
+
+## update the date
+estimation_records <- estimation_records |>
+  mutate(date = ifelse(Model == "iid" & source == "cp_spatial" & 
+                             data.collection == "replication",
+                              as.character(format(ymd(today()), "%m/%d/%y")), date))
+
+write.csv(estimation_records, file = "data/estimates_and_sources.csv", row.names = F )
+```
+
+### Spatial Structure Setup
+
+#### Set up geometry
+
+```{r}
+# if using tidycensus-- leaving in case someone wants to do a different analysis with census data
+# state_laea %>%
+#   inner_join(fips_codes %>% select(state, state_code, state_name), 
+#              join_by(GEOID == state_code))
+
+wall_sp = us_states %>%## contains boundaries of contiguous 48 + DC
+  inner_join(wall_data, join_by(NAME == name)) 
+
+
+wall_sp_ordered = wall_sp %>% arrange(GEOID) %>% 
+  mutate(GEOID = seq(from = 1, to = 48, by = 1)) 
+
+
+wall_sp_ordered %>% 
+  ggplot(aes(fill = verbal, label = "a")) + geom_sf() +
+  scale_fill_gradientn(name = "Verbal",
+    colors = c("white", "lightgray","gray", "darkgray", "black"),
+    values = rescale(c(0, 506, 530, 565, 1000))) +
+  labs(title = "Average SAT Verbal Scores for 1999")
+
+```
+
+#### Compute weight matrix based on geometry
+
+```{r}
+
+## vignette("nb_sf")
+nb_us <- poly2nb(wall_sp_ordered, queen = TRUE) ### 💅 👑
+#nb_us[] # states are alphabetical, numbered 1-48
+
+```
+
+#### Examine i.i.d. residuals for spatial autocorrelation
+
+Note: can only use moran's test on lm resids, not the sar and car.
+
+```{r}
+moran.test(fit_iid$residuals, listw = nb2listw(nb_us, style = "W"))
+# p-value of <0.001 indicates strong spatial autocorrelation under Moran I test
+```
+
+### Reproduce SAR model
+
+Values from Table 1:
+
+```{r}
+#| label: wall-sar
+
+wall_ests |>
+  dplyr::filter(Model == "SAR") |>
+  select("Parameter", "Estimate", "Standard.error") 
+```
+
+
+#### Initial attempt
+
+Note: neither the point estimates nor the standard errors match. Crucially, the log-likelihood is different. WORK ON THIS.
+
+```{r}
+
+fit_SAR <- spatialreg::spautolm(verbal~perc_elig + I(perc_elig^2), 
+                                data = wall_sp_ordered, 
+                                listw = nb2listw(nb_us, style = "W"),
+                                family = "SAR")
+
+summary(fit_SAR) ## doesn't match-- weights or code difference like (I suspect) with iid?
+
+```
+
+### Reproduce CAR model
+
+Values from Table 1:
+
+```{r}
+#| label: wall-car
+
+wall_ests |>
+  dplyr::filter(Model == "CAR") |>
+  select("Parameter", "Estimate", "Standard.error") 
+```
+
+#### Initial attempt
+
+Note: neither the point estimates nor the standard errors match. Crucially, the log-likelihood is different. WORK ON THIS.
+```{r}
+
+fit_CAR <- spatialreg::spautolm(verbal~perc_elig + I(perc_elig^2), 
+                                data = wall_sp_ordered, 
+                                listw = nb2listw(nb_us, style = "W"),
+                                family = "CAR") 
+
+## remind me to discuss the warning
+
+summary(fit_CAR) ## doesn't match-- weights or code difference like (I suspect) with iid?
+
+```
+
+## Map the fitted values
+
+WORK ON THIS: the three visuals below are diagnostic checks, not maps of fitted values. Maybe separate out diagnostic checks.
+
+### IID Model
+
+```{r}
+
+iid_fits = data.frame(
+  fitted = fitted(fit_iid),
+  residuals = residuals(fit_iid)
+)
+
+ggplot(data = iid_fits, aes(x = fitted, y = residuals)) + geom_point()
+
+```
+
+### SAR Model
+
+```{r}
+
+SAR_fits = data.frame(
+  fitted = fitted(fit_SAR),
+  residuals = residuals(fit_SAR)
+)
+
+ggplot(data = SAR_fits, aes(x = fitted, y = residuals)) + geom_point()
+```
+
+### CAR Model
+
+```{r}
+
+CAR_fits = data.frame(
+  fitted = fitted(fit_CAR),
+  residuals = residuals(fit_CAR)
+)
+
+ggplot(data = CAR_fits, aes(x = fitted, y = residuals)) + geom_point()
+```
+
+## Map Visualization of Fits
+
+```{r}
+# ChatGPT code (needs cleaning) WORK ON THIS
+nb <- poly2nb(as(wall_sp_ordered, "Spatial"), queen = TRUE)
+lw <- nb2listw(nb, style = "W", zero.policy = TRUE)
+
+# extract lambda (spatial parameter)
+lambda_hat <- coef(fit_SAR)[["lambda"]]
+if (is.na(lambda_hat)) lambda_hat <- fit_SAR$lambda  # fallback if stored differently
+
+# residuals (innovations)
+e_hat <- residuals(fit_SAR)
+
+# convert listw to matrix
+W <- listw2mat(lw)
+I <- diag(nrow(W))
+
+# spatially structured component
+u_hat <- as.numeric(solve(I - lambda_hat * W, e_hat))
+
+wall_sp_ordered$small_scale <- u_hat
+
+
+ggplot(wall_sp_ordered) +
+  geom_sf(aes(fill = small_scale), color = "black", linewidth = 0.15) +
+  coord_sf(datum = NA) +
+  scale_fill_gradient2(
+    name = "Small-scale\nspatial structure",
+    low = "white", mid = "gray", high = "black", midpoint = 0
+  ) +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+```
