@@ -1,0 +1,36 @@
+## got these from claude probs not all relevant but no harm to have them
+
+# Quarto render output
+/_site/
+/_book/
+/_manuscript/
+/.quarto/
+
+# Output formats
+*.html
+*.pdf
+*.docx
+*.pptx
+*.epub
+
+# R related
+.Rproj.user/
+.Rhistory
+.Rdata
+.RDataTmp
+*.Rproj
+
+# Knitr/R Markdown
+*_cache/
+*_files/
+/libs/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
