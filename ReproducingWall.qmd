@@ -31,6 +31,7 @@ library(olsrr) ## for ordinary least squares
 library(tidyverse) ## group of packages for better visualization
 library(scales) # for scaling color breaks
 library(lubridate) ## ymd function
+library(patchwork) ## for side by side plots
 
 ### wall estimates from paper for comparison 
 
@@ -69,6 +70,51 @@ wall_data <-
 ## WORK ON THIS
 ```
 
+```{r}
+# Figure 1 - Alejandro Gomez
+# Left: histogram of 48 contiguous state average SAT verbal scores for 1999
+# Right: scatterplot of state average SAT verbal scores against percent of students eligible who actually took the exam.
+
+# library(patchwork)
+
+verb_hist = ggplot(data = wall_data,aes(x = verbal)) + 
+  geom_histogram(fill = "grey50",
+                 binwidth = 5,
+                 boundary = 480,
+                 closed = "left",
+                 color = "black",
+                 linewidth = 0.4) + 
+  labs(x = "Verbal SAT Score", y = "Frequency") 
+
+verb_scat = ggplot(data = wall_data,aes(x = perc_elig, y = verbal)) + 
+  geom_point() + 
+  labs(x = "Percent Eligible Students who took Exam", y = "Verbal SAT Score")
+
+verb_hist + verb_scat
+  
+```
+
+```{r}
+# Figure 2 -- Chloropleth map of 48 contiguous state average SAT verbal scores for 1999.
+
+wall_sp = us_states %>%## contains boundaries of contiguous 48 + DC
+  inner_join(wall_data, join_by(NAME == name)) 
+
+
+wall_sp_ordered = wall_sp %>% arrange(GEOID) %>% 
+  mutate(GEOID = seq(from = 1, to = 48, by = 1)) 
+
+# close, but not all state colors match the Wall paper
+wall_sp_ordered %>% 
+  ggplot(aes(fill = verbal)) +
+  geom_sf() +
+  scale_fill_gradientn(
+    colours = grey.colors(4, start = 0.9, end = 0),
+    breaks = c(0, 506, 530, 565)) +
+  labs(title = "Average SAT Verbal Scores for 1999")
+
+```
+
 ## Try to Reproduce Wall paper
 
 The spreadsheet `estimates_and_sources.csv` contains all the values from Table 1 in the Wall paper. This was read in at the top of the file as `estimation_records`. 
@@ -98,7 +144,6 @@ summary(fit_iid) ## coefficients match, but standard errors (of parameters and r
 
 logLik(fit_iid) ## matches
 ```
-
 
 
 #### Adjusting R estimates to match Wall paper
