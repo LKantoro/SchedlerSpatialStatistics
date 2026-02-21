@@ -1,5 +1,5 @@
 ---
-title: "Reroducing Wall"
+title: "Reproducing Wall"
 author:
   - name: Julia Schedler
     affiliations:
@@ -20,6 +20,7 @@ bibliography: data/citations_for_reproduction.bib
 #| label: setup
 #| message: false
 #| code-fold: true
+#| warning: false
 library(sf) ## for spatial functionality
 #library(tidycensus) ## for state boundaries-- actually we can get from spData imported by spatial reg
 library(spatialreg) ## for car and sar
@@ -49,7 +50,16 @@ Reproduce the analyses in @wall_close_2004 table:
 
 ## Read in the data
 
-WORK ON THIS: Add a bit of detail about the data, like a bulleted list of data descriptions.
+- The following data set is taken from 1999 United States SAT data. Scores and elgibility of the 48 contiguous states are included.
+  
+- Variables include:
+  - name: Full name of the state
+  - state: Shortened name of state
+  - verbal: Average verbal score of all test takers
+  - math Average math score of all test takers
+  - perc_elig: Percent of eligible students who the exam
+
+
 
 ```{r}
 #| label: read-data
@@ -67,7 +77,6 @@ wall_data <-
 ## histograms of each variable
 ## scatterplots 
 
-## WORK ON THIS
 ```
 
 ```{r}
@@ -114,6 +123,58 @@ wall_sp_ordered %>%
   labs(title = "Average SAT Verbal Scores for 1999")
 
 ```
+
+
+
+```{r}
+# Histogram, Scatterplot, amd Choropleth of Math Scores
+
+# Left: histogram of 48 contiguous state average SAT math scores for 1999
+# Right: scatterplot of state average SAT math scores against percent of students eligible who actually took the exam.
+
+math_hist = ggplot(data = wall_data,aes(x = math)) + 
+  geom_histogram(fill = "grey50",
+                 binwidth = 5,
+                 boundary = 480,
+                 closed = "left",
+                 color = "black",
+                 linewidth = 0.4) + 
+  labs(x = "Math SAT Score", y = "Frequency") 
+
+math_scat = ggplot(data = wall_data,aes(x = perc_elig, y = math)) + 
+  geom_point() + 
+  labs(x = "Percent Eligible Students who took Exam", y = "Math SAT Score")
+
+math_hist + math_scat
+  
+```
+
+```{r}
+# Choropleth map of 48 contiguous state average SAT Math scores for 1999.
+
+wall_sp = us_states %>%
+  inner_join(wall_data, join_by(NAME == name)) 
+
+
+wall_sp_ordered = wall_sp %>% arrange(GEOID) %>% 
+  mutate(GEOID = seq(from = 1, to = 48, by = 1)) 
+
+wall_sp_ordered %>% 
+  ggplot(aes(fill = math)) +
+  geom_sf() +
+  scale_fill_gradientn(
+    colours = grey.colors(4, start = 0.9, end = 0),
+    breaks = c(0, 506, 530, 565)) +
+  labs(title = "Average SAT Math Scores for 1999")
+
+```
+
+
+
+
+
+
+
 
 ## Try to Reproduce Wall paper
 
@@ -397,7 +458,34 @@ wall_ests |>
 ```{r}
 #| label: repro-vg
 
-## WORK ON THIS
+## WORK ON THIS (in progress)
+
+library(gstat)
+
+# Creating Empirical Variogram
+fit_exp_vg = variogram(verbal ~ perc_elig, data = wall_sp_ordered)
+plot(fit_exp_vg)
+
+
+vgm_model <- vgm(nugget = 50,
+                 psill = 10, 
+                 range = 500,
+                 model = "Exp")
+vgm_model
+
+
+vgm_fit = fit.variogram(fit_exp_vg, vgm_model)
+
+
+plot(fit_exp_vg, vgm_fit)
+
+vgm_fit
+
+
+# B0 = nugget
+# B1 = partial sill
+# B2 = range parameter
+
 ```
 
 ## Map the fitted values
@@ -407,6 +495,32 @@ WORK ON THIS: the three visuals below are diagnostic checks, not maps of fitted 
 ### IID Model
 
 ```{r}
+# map fitted values
+
+# fitted values vs actual values
+
+
+
+```
+
+
+
+### SAR Model
+
+
+### CAR Model
+
+
+
+
+## Diagnostic Checks
+
+
+### IID Model
+
+```{r}
+# plotting residuals vs fitted models
+
 
 iid_fits = data.frame(
   fitted = fitted(fit_iid),
@@ -420,6 +534,7 @@ ggplot(data = iid_fits, aes(x = fitted, y = residuals)) + geom_point()
 ### SAR Model
 
 ```{r}
+# plotting residuals vs fitted models
 
 SAR_fits = data.frame(
   fitted = fitted(fit_SAR),
@@ -432,6 +547,7 @@ ggplot(data = SAR_fits, aes(x = fitted, y = residuals)) + geom_point()
 ### CAR Model
 
 ```{r}
+# plotting residuals vs fitted models
 
 CAR_fits = data.frame(
   fitted = fitted(fit_CAR),
