@@ -33,6 +33,7 @@ library(tidyverse) ## group of packages for better visualization
 library(scales) # for scaling color breaks
 library(lubridate) ## ymd function
 library(patchwork) ## for side by side plots
+library(gstat) # for exponential variogram
 
 ### wall estimates from paper for comparison 
 
@@ -460,16 +461,16 @@ wall_ests |>
 
 ## WORK ON THIS (in progress)
 
-library(gstat)
-
 # Creating Empirical Variogram
-fit_exp_vg = variogram(verbal ~ perc_elig, data = wall_sp_ordered)
+fit_exp_vg = variogram(verbal ~ 1 + perc_elig + I(perc_elig^2), data = wall_sp_ordered)
+summary(fit_exp_vg)
+
 plot(fit_exp_vg)
 
 
-vgm_model <- vgm(nugget = 50,
-                 psill = 10, 
-                 range = 500,
+vgm_model <- vgm(nugget =500,
+                 psill = 1000, 
+                 range = 490,
                  model = "Exp")
 vgm_model
 
@@ -477,7 +478,9 @@ vgm_model
 vgm_fit = fit.variogram(fit_exp_vg, vgm_model)
 
 
-plot(fit_exp_vg, vgm_fit)
+print(vgm_fit)
+
+plot(fit_exp_vg, vgm_fit, xlim = c(0, 1800), ylim = c(0, 400))
 
 vgm_fit
 
@@ -486,19 +489,29 @@ vgm_fit
 # B1 = partial sill
 # B2 = range parameter
 
+
 ```
 
-## Map the fitted values
 
-WORK ON THIS: the three visuals below are diagnostic checks, not maps of fitted values. Maybe separate out diagnostic checks.
+
+
+## Map the fitted values
 
 ### IID Model
 
 ```{r}
 # map fitted values
 
-# fitted values vs actual values
+# choropleth of fitted values
 
+# fitted iid values
+
+wall_sp_ordered %>% 
+  ggplot(aes(fill = fitted.values(fit_iid), label = "a")) + geom_sf() +
+  scale_fill_gradientn(name = "Verbal",
+    colors = c("white", "lightgray","gray", "darkgray", "black"),
+    values = rescale(c(0, 506, 530, 565, 1000))) +
+  labs(title = "iid Fitted Average SAT Verbal Scores for 1999")
 
 
 ```
@@ -508,9 +521,33 @@ WORK ON THIS: the three visuals below are diagnostic checks, not maps of fitted 
 ### SAR Model
 
 
+```{r}
+
+# fitted SAR values
+
+wall_sp_ordered %>% 
+  ggplot(aes(fill = fitted.values(fit_SAR), label = "a")) + geom_sf() +
+  scale_fill_gradientn(name = "Verbal",
+    colors = c("white", "lightgray","gray", "darkgray", "black"),
+    values = rescale(c(0, 506, 530, 565, 1000))) +
+  labs(title = "SAR Fitted Average SAT Verbal Scores for 1999")
+```
+
+
 ### CAR Model
 
 
+```{r}
+
+# fitted CAR values
+
+wall_sp_ordered %>% 
+  ggplot(aes(fill = fitted.values(fit_CAR), label = "a")) + geom_sf() +
+  scale_fill_gradientn(name = "Verbal",
+    colors = c("white", "lightgray","gray", "darkgray", "black"),
+    values = rescale(c(0, 506, 530, 565, 1000))) +
+  labs(title = "CAR Fitted Average SAT Verbal Scores for 1999")
+```
 
 
 ## Diagnostic Checks
