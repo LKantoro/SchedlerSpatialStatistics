@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julia Schedler">
+<meta name="author" content="Lucas R. Kantorowski">
+<meta name="author" content="Alejandro Gomez">
+<meta name="author" content="Mason Souza">
+
+<title>Reproducing Wall</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="ReproducingWall_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ReproducingWall_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="ReproducingWall_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="ReproducingWall_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="ReproducingWall_files/libs/quarto-html/popper.min.js"></script>
+<script src="ReproducingWall_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ReproducingWall_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ReproducingWall_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ReproducingWall_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ReproducingWall_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ReproducingWall_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ReproducingWall_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#goal" id="toc-goal" class="nav-link active" data-scroll-target="#goal">Goal</a></li>
+  <li><a href="#read-in-the-data" id="toc-read-in-the-data" class="nav-link" data-scroll-target="#read-in-the-data">Read in the data</a></li>
+  <li><a href="#visualize-the-data-non-spatially" id="toc-visualize-the-data-non-spatially" class="nav-link" data-scroll-target="#visualize-the-data-non-spatially">Visualize the data non-spatially</a></li>
+  <li><a href="#try-to-reproduce-wall-paper" id="toc-try-to-reproduce-wall-paper" class="nav-link" data-scroll-target="#try-to-reproduce-wall-paper">Try to Reproduce Wall paper</a>
+  <ul class="collapse">
+  <li><a href="#reproduce-iid-model" id="toc-reproduce-iid-model" class="nav-link" data-scroll-target="#reproduce-iid-model">Reproduce IID Model</a></li>
+  <li><a href="#spatial-structure-setup" id="toc-spatial-structure-setup" class="nav-link" data-scroll-target="#spatial-structure-setup">Spatial Structure Setup</a></li>
+  <li><a href="#reproduce-sar-model" id="toc-reproduce-sar-model" class="nav-link" data-scroll-target="#reproduce-sar-model">Reproduce SAR model</a></li>
+  <li><a href="#reproduce-car-model" id="toc-reproduce-car-model" class="nav-link" data-scroll-target="#reproduce-car-model">Reproduce CAR model</a></li>
+  <li><a href="#reproduce-exponential-vgm-model" id="toc-reproduce-exponential-vgm-model" class="nav-link" data-scroll-target="#reproduce-exponential-vgm-model">Reproduce Exponential VGM model</a></li>
+  </ul></li>
+  <li><a href="#map-the-fitted-values" id="toc-map-the-fitted-values" class="nav-link" data-scroll-target="#map-the-fitted-values">Map the fitted values</a>
+  <ul class="collapse">
+  <li><a href="#iid-model" id="toc-iid-model" class="nav-link" data-scroll-target="#iid-model">IID Model</a></li>
+  <li><a href="#sar-model" id="toc-sar-model" class="nav-link" data-scroll-target="#sar-model">SAR Model</a></li>
+  <li><a href="#car-model" id="toc-car-model" class="nav-link" data-scroll-target="#car-model">CAR Model</a></li>
+  </ul></li>
+  <li><a href="#diagnostic-checks" id="toc-diagnostic-checks" class="nav-link" data-scroll-target="#diagnostic-checks">Diagnostic Checks</a>
+  <ul class="collapse">
+  <li><a href="#iid-model-1" id="toc-iid-model-1" class="nav-link" data-scroll-target="#iid-model-1">IID Model</a></li>
+  <li><a href="#sar-model-1" id="toc-sar-model-1" class="nav-link" data-scroll-target="#sar-model-1">SAR Model</a></li>
+  <li><a href="#car-model-1" id="toc-car-model-1" class="nav-link" data-scroll-target="#car-model-1">CAR Model</a></li>
+  </ul></li>
+  <li><a href="#map-visualization-of-fits" id="toc-map-visualization-of-fits" class="nav-link" data-scroll-target="#map-visualization-of-fits">Map Visualization of Fits</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Reproducing Wall</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Authors</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Julia Schedler </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Cal Poly SLO
+          </p>
+      </div>
+    <div class="quarto-title-meta-contents">
+    <p class="author">Lucas R. Kantorowski </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Cal Poly SLO
+          </p>
+      </div>
+    <div class="quarto-title-meta-contents">
+    <p class="author">Alejandro Gomez </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Cal Poly SLO
+          </p>
+      </div>
+    <div class="quarto-title-meta-contents">
+    <p class="author">Mason Souza </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Cal Poly SLO
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf) <span class="do">## for spatial functionality</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#library(tidycensus) ## for state boundaries-- actually we can get from spData imported by spatial reg</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatialreg) <span class="do">## for car and sar</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="do">## for data cleaning</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2) <span class="do">## for plotting</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep) <span class="do">## for contiguity/weight matrix</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car) <span class="do">## for regression</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(olsrr) <span class="do">## for ordinary least squares</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="do">## group of packages for better visualization</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales) <span class="co"># for scaling color breaks</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate) <span class="do">## ymd function</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="do">## for side by side plots</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gstat) <span class="co"># for exponential variogram</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="do">### wall estimates from paper for comparison </span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>estimation_records <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/estimates_and_sources.csv"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="do">## extract only the values from paper (other rows we will write as we replicate)</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>wall_ests<span class="ot">&lt;-</span> estimation_records <span class="sc">|&gt;</span> </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"wall"</span> <span class="sc">&amp;</span> data.collection <span class="sc">==</span> <span class="st">"transcription"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="goal" class="level2">
+<h2 class="anchored" data-anchor-id="goal">Goal</h2>
+<p>Reproduce the analyses in <span class="citation" data-cites="wall_close_2004">Wall (<a href="#ref-wall_close_2004" role="doc-biblioref">2004</a>)</span> table:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data/images/table_1_screenshot.png" class="img-fluid figure-img"></p>
+<figcaption>Screenshot of Table 1 from Wall 2004, showing parameter estimates for SAR, CAR, Exponential Variogram, and I.I.D. models.</figcaption>
+</figure>
+</div>
+</section>
+<section id="read-in-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="read-in-the-data">Read in the data</h2>
+<ul>
+<li><p>The following data set is taken from 1999 United States SAT data. Scores and elgibility of the 48 contiguous states are included.</p></li>
+<li><p>Variables include:</p>
+<ul>
+<li>name: Full name of the state</li>
+<li>state: Shortened name of state</li>
+<li>verbal: Average verbal score of all test takers</li>
+<li>math Average math score of all test takers</li>
+<li>perc_elig: Percent of eligible students who the exam</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>wall_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/wall_2004_dataset.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>wall_data <span class="ot">&lt;-</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  wall_data <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"District of Columbia"</span>, <span class="st">"Alaska"</span>, <span class="st">"Hawaii"</span>, <span class="st">"USA"</span>))) <span class="do">## analysis does not include DC, AK, or HI (it could include one though! q: which one and what important thing about our model spec would change?) ## also has total USA</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="visualize-the-data-non-spatially" class="level2">
+<h2 class="anchored" data-anchor-id="visualize-the-data-non-spatially">Visualize the data non-spatially</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Figure 1 - Alejandro Gomez</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Left: histogram of 48 contiguous state average SAT verbal scores for 1999</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Right: scatterplot of state average SAT verbal scores against percent of students eligible who actually took the exam.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># library(patchwork)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>verb_hist <span class="ot">=</span> <span class="fu">ggplot</span>(<span class="at">data =</span> wall_data,<span class="fu">aes</span>(<span class="at">x =</span> verbal)) <span class="sc">+</span> </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">"grey50"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">binwidth =</span> <span class="dv">5</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">boundary =</span> <span class="dv">480</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">closed =</span> <span class="st">"left"</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">linewidth =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Verbal SAT Score"</span>, <span class="at">y =</span> <span class="st">"Frequency"</span>) </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>verb_scat <span class="ot">=</span> <span class="fu">ggplot</span>(<span class="at">data =</span> wall_data,<span class="fu">aes</span>(<span class="at">x =</span> perc_elig, <span class="at">y =</span> verbal)) <span class="sc">+</span> </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percent Eligible Students who took Exam"</span>, <span class="at">y =</span> <span class="st">"Verbal SAT Score"</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>verb_hist <span class="sc">+</span> verb_scat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Figure 2 -- Chloropleth map of 48 contiguous state average SAT verbal scores for 1999.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>wall_sp <span class="ot">=</span> us_states <span class="sc">%&gt;%</span><span class="do">## contains boundaries of contiguous 48 + DC</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(wall_data, <span class="fu">join_by</span>(NAME <span class="sc">==</span> name)) </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="ot">=</span> wall_sp <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(GEOID) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GEOID =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">48</span>, <span class="at">by =</span> <span class="dv">1</span>)) </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># close, but not all state colors match the Wall paper</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="sc">%&gt;%</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> verbal)) <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">colours =</span> <span class="fu">grey.colors</span>(<span class="dv">4</span>, <span class="at">start =</span> <span class="fl">0.9</span>, <span class="at">end =</span> <span class="dv">0</span>),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">506</span>, <span class="dv">530</span>, <span class="dv">565</span>)) <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average SAT Verbal Scores for 1999"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Histogram, Scatterplot, amd Choropleth of Math Scores</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Left: histogram of 48 contiguous state average SAT math scores for 1999</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Right: scatterplot of state average SAT math scores against percent of students eligible who actually took the exam.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>math_hist <span class="ot">=</span> <span class="fu">ggplot</span>(<span class="at">data =</span> wall_data,<span class="fu">aes</span>(<span class="at">x =</span> math)) <span class="sc">+</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">"grey50"</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">binwidth =</span> <span class="dv">5</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">boundary =</span> <span class="dv">480</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">closed =</span> <span class="st">"left"</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                 <span class="at">linewidth =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Math SAT Score"</span>, <span class="at">y =</span> <span class="st">"Frequency"</span>) </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>math_scat <span class="ot">=</span> <span class="fu">ggplot</span>(<span class="at">data =</span> wall_data,<span class="fu">aes</span>(<span class="at">x =</span> perc_elig, <span class="at">y =</span> math)) <span class="sc">+</span> </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percent Eligible Students who took Exam"</span>, <span class="at">y =</span> <span class="st">"Math SAT Score"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>math_hist <span class="sc">+</span> math_scat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choropleth map of 48 contiguous state average SAT Math scores for 1999.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>wall_sp <span class="ot">=</span> us_states <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(wall_data, <span class="fu">join_by</span>(NAME <span class="sc">==</span> name)) </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="ot">=</span> wall_sp <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(GEOID) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GEOID =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">48</span>, <span class="at">by =</span> <span class="dv">1</span>)) </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="sc">%&gt;%</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> math)) <span class="sc">+</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">colours =</span> <span class="fu">grey.colors</span>(<span class="dv">4</span>, <span class="at">start =</span> <span class="fl">0.9</span>, <span class="at">end =</span> <span class="dv">0</span>),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">506</span>, <span class="dv">530</span>, <span class="dv">565</span>)) <span class="sc">+</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average SAT Math Scores for 1999"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="try-to-reproduce-wall-paper" class="level2">
+<h2 class="anchored" data-anchor-id="try-to-reproduce-wall-paper">Try to Reproduce Wall paper</h2>
+<p>The spreadsheet <code>estimates_and_sources.csv</code> contains all the values from Table 1 in the Wall paper. This was read in at the top of the file as <code>estimation_records</code>.</p>
+<section id="reproduce-iid-model" class="level3">
+<h3 class="anchored" data-anchor-id="reproduce-iid-model">Reproduce IID Model</h3>
+<p>The code below outputs the values for the i.i.d. model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">### wall estimates from paper for comparison </span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">## report the standard error estimates</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>wall_ests <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Model <span class="sc">==</span> <span class="st">"iid"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"Parameter"</span>, <span class="st">"Estimate"</span>, <span class="st">"Standard.error"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Parameter      Estimate Standard.error
+1      beta_0      590.2600          3.930
+2      beta_1       -2.8800          0.300
+3      beta_2        0.0233          0.004
+4         rho -2001002.0000   -2001002.000
+5       range -2001002.0000   -2001002.000
+6 var_param_1      124.4000   -2001002.000
+7 var_param_2 -2001002.0000   -2001002.000
+8     log_lik     -183.9000   -2001002.000</code></pre>
+</div>
+</div>
+<section id="initial-attempt" class="level4">
+<h4 class="anchored" data-anchor-id="initial-attempt">Initial attempt</h4>
+<p>Estimated standard errors do match now but this was made work with some R tricks, and instead in the background is still 3.93, .304, and .004</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fit_iid <span class="ot">&lt;-</span> <span class="fu">lm</span>(verbal <span class="sc">~</span> perc_elig <span class="sc">+</span> <span class="fu">I</span>(perc_elig<span class="sc">^</span><span class="dv">2</span>), <span class="at">data =</span> wall_data)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># MLE SEs (Wall style)</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nobs</span>(fit_iid)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">coef</span>(fit_iid))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>se_wall <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">vcov</span>(fit_iid) <span class="sc">*</span> ((n <span class="sc">-</span> p)<span class="sc">/</span>n)))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Format for table</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>std_errs <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, <span class="fu">signif</span>(se_wall, <span class="dv">2</span>))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>iid_results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate =</span> <span class="fu">coef</span>(fit_iid),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Std_Error =</span> std_errs</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>iid_results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Estimate Std_Error
+(Intercept)    590.26463977     3.900
+perc_elig       -2.88181285     0.300
+I(perc_elig^2)   0.02326029     0.004</code></pre>
+</div>
+</div>
+</section>
+<section id="adjusting-r-estimates-to-match-wall-paper" class="level4">
+<h4 class="anchored" data-anchor-id="adjusting-r-estimates-to-match-wall-paper">Adjusting R estimates to match Wall paper</h4>
+<p>The formula to compute standard errors for a fitted regression model <span class="math inline">\(\hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 + \dots + \hat{\beta}_k X_k\)</span> is:</p>
+<p><span class="math display">\[
+\text{SE}(\hat{\beta_i}) = \sqrt{s^2 (X^TX)^{-1}}
+\]</span></p>
+<p><span class="math inline">\(X^TX\)</span> is just the design matrix/data, so that should be the same between the Wall paper and our approach here with <code>lm</code> in R. So, perhaps the discrepancy is in that <span class="math inline">\(s^2\)</span> term.</p>
+<p>Recall that here, <span class="math inline">\(s^2\)</span> is an estimate of the variance of the true errors <span class="math inline">\(\varepsilon \sim N(0, \sigma^2)\)</span>, where <span class="math inline">\(Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k + \varepsilon\)</span>).</p>
+<p>There are several different ways to compute this estimate: the Maximum Likelihood Estimate (MLE), and the bias-adjusted MLE.</p>
+<p>Table 1 (Wall) reports the biased MLE of the variance of the errors:</p>
+<p><span class="math display">\[
+s^2_{\text{wall}} = s^2_{biased} = \frac{SSE}{n}%
+\]</span> While the <code>summary</code> outputs the bias-adjusted MLE:</p>
+<p><span class="math display">\[
+s^2_{\tt{lm}\text{ output}} = s^2_{unbiased} = \frac{SSE}{n -k-1}
+\]</span></p>
+<p>The code below computes the (biased) MLE of <span class="math inline">\(\sigma^2\)</span> and then uses it to re-calculate <span class="math inline">\(\text{SE}(\hat{\beta_i})\)</span>, which gives us values that match the wall paper.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>MLEs and Bias
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When we set up some parametric model (like <span class="math inline">\(x_i \sim N(\mu, \sigma^2)\)</span> i.i.d. for all <span class="math inline">\(i\)</span>), we inevitably want to find formulas that use the sample data, or <em>estimators</em> that will allow us to compute <em>estimates of unknown parameters.</em></p>
+<p>One method to derive these estimators is the method of maximum likelihood estimation.</p>
+<p>Once we have derived such a formula, we can see whether it is unbiased. For example, if I have some arbitrary formula/estimator <span class="math inline">\(\hat{\theta}\)</span> that is supposed to estimate an unknown quantity <span class="math inline">\(\theta\)</span>, I might ask whether the following equality holds:</p>
+<p><span class="math display">\[
+\mathbb{E}(\hat{\theta}) = \theta
+\]</span></p>
+<p>In other words, if I take all possible random samples and compute estimates using the formula <span class="math inline">\(\hat{\theta}\)</span> for all of those samples, with the average of the estimates equal the underlying true value <span class="math inline">\(\theta\)</span>?</p>
+<p>If the equality holds, then we say that the estimator is unbiased. Note that MLEs are not guaranteed to be unbiased, though they do have lots of nice properties.</p>
+<section id="unbiased-mle-example" class="level4">
+<h4 class="anchored" data-anchor-id="unbiased-mle-example">Unbiased MLE example</h4>
+<p>Equations 7 and 8 from the <a href="https://statproofbook.github.io/P/ug-mle">“Proof: Maximum likelihood estimation for the univariate Gaussian” page of the Book of Statistical Proofs</a> show the derivation of the MLE of <span class="math inline">\(\mu\)</span> from a random sample of <span class="math inline">\(x_1, \dots, x_n\)</span> where <span class="math inline">\(x_i \sim N(\mu, \sigma^2)\)</span>. This derivation results in the following <em>estimator</em> of the unknown parameter <span class="math inline">\(\mu\)</span>:</p>
+<p><span class="math display">\[
+\hat{\mu}_{\text{MLE}}= \frac{\sum_{i = 1}^n x_i}{n}
+\]</span></p>
+<p>Of course, we usually use the notation <span class="math inline">\(\bar{x}\)</span> for the formula above. Is <span class="math inline">\(\hat{\mu}_{\text{MLE}}\)</span> unbiased for <span class="math inline">\(\mu\)</span>? Well,</p>
+<p><span class="math display">\[
+\mathbb{E}\left ( \hat{\mu}_{\text{MLE}} \right ) = \mathbb{E}\left ( \frac{\sum_{i = 1}^n x_i}{n} \right ) = \frac{1}{n}\sum_{i = 1}^n \mathbb{E}(x_i) = \frac{1}{n} \cdot n \mu = \mu
+\]</span></p>
+<p>So <span class="math inline">\(\bar{x} = \hat{\mu}_{\text{MLE}}\)</span> is unbiased for <span class="math inline">\(\mu\)</span>.</p>
+</section>
+<section id="biased-mle-example" class="level4">
+<h4 class="anchored" data-anchor-id="biased-mle-example">Biased MLE example</h4>
+<p>Equations 9 and 10 from the <a href="https://statproofbook.github.io/P/ug-mle">“Proof: Maximum likelihood estimation for the univariate Gaussian” page of the Book of Statistical Proofs</a> show the derivation of the MLE of <span class="math inline">\(\sigma^2\)</span> from a random sample of <span class="math inline">\(x_1, \dots, x_n\)</span> where <span class="math inline">\(x_i \sim N(0, \sigma^2)\)</span>. This derivation results in the following <em>estimator</em> of the unknown parameter <span class="math inline">\(\sigma^2\)</span>:</p>
+<p><span class="math display">\[
+\hat{\sigma}^2_{\text{MLE}} = \frac{\sum_{i = 1}^n(x_i - \bar{x})^2}{n}
+\]</span></p>
+<p>Is <span class="math inline">\(\hat{\sigma}^2_{\text{MLE}}\)</span> unbiased for <span class="math inline">\(\sigma^2\)</span>? We need to compute the expected value of the estimator. You can ask your 426 professor for the steps, but we end up with:</p>
+<p><span class="math display">\[
+\mathbb{E}\left( \frac{\sum_{i = 1}^n(x_i - \bar{x})^2}{n} \right ) = \frac{(n-1)\cdot\sigma^2}{ n} \ne \sigma^2
+\]</span></p>
+<p>Note that If <span class="math inline">\(n\)</span> is very large, then <span class="math inline">\((n-1)/n\)</span> is very close to 1. This is how <code>NumPy</code> gets away with using the biased estimator of sample standard deviation/variance by default. See this <a href="https://stackoverflow.com/questions/27600207/why-does-numpy-std-give-a-different-result-to-matlab-std#:~:text=Unless%20told%20otherwise,N%20%2D%20ddof%20instead.">Stack Overflow Answer</a>.</p>
+</section>
+<section id="bias-adjusting-the-mle" class="level4">
+<h4 class="anchored" data-anchor-id="bias-adjusting-the-mle">Bias-adjusting the MLE</h4>
+<p>Note that if we adjust the MLE estimate of <span class="math inline">\(\sigma^2\)</span> by dividing by <span class="math inline">\(n-1\)</span> instead of <span class="math inline">\(n\)</span> we can obtain an unbiased estimator. Try to show this yourself!</p>
+</section>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## compute the bias-unadjusted MLE</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>mle_sigma_sq <span class="ot">&lt;-</span> <span class="fu">sum</span>(fit_iid<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>(<span class="fu">nrow</span>(wall_data))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">## compute standard errors manually</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(fit_iid)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>se_betas_wall <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X))<span class="sc">*</span>mle_sigma_sq)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## print out manually computed wall estimates</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(fit_iid<span class="sc">$</span>coefficients, se_betas_wall)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              (Intercept)  perc_elig I(perc_elig^2)
+               590.264640 -2.8818129     0.02326029
+se_betas_wall    3.933232  0.3036172     0.00380810</code></pre>
+</div>
+</div>
+</section>
+<section id="update-i.i.d.-model-in-estimates_and_sources.csv" class="level4">
+<h4 class="anchored" data-anchor-id="update-i.i.d.-model-in-estimates_and_sources.csv">Update i.i.d. model in <code>estimates_and_sources.csv</code></h4>
+<p>WORK ON THIS: Need to add in mean square error (currently is NA, should be a value from <code>fit_iid</code>.)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## add some code to verify the match</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span><span class="al">FIXME</span><span class="do"> </span><span class="al">###</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>estimates <span class="ot">&lt;-</span> <span class="fu">c</span>(fit_iid<span class="sc">$</span>coefficients, <span class="cn">NA</span>, <span class="cn">NA</span>, mle_sigma_sq, <span class="cn">NA</span>, <span class="fu">logLik</span>(fit_iid) </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>std_errs <span class="ot">&lt;-</span> <span class="fu">c</span>(se_betas_wall, <span class="fu">rep</span>(<span class="sc">-</span><span class="dv">212</span>, <span class="at">times =</span> <span class="dv">5</span>)) <span class="do">## no se estimates for other params</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="do">## write the estimates to file:</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Create a data frame with the new estimates</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>new_estimates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> <span class="fu">rep</span>(<span class="fu">format</span>(<span class="fu">today</span>(), <span class="st">"%m/%d/%y"</span>), <span class="at">times =</span> <span class="fu">length</span>(estimates)),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">rep</span>(<span class="st">"iid"</span>, <span class="at">times =</span> <span class="fu">length</span>(estimates)),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">source =</span> <span class="fu">rep</span>(<span class="st">"cp_spatial"</span>, <span class="at">times =</span> <span class="fu">length</span>(estimates)),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">data.collection =</span> <span class="fu">rep</span>(<span class="st">"replication"</span>, <span class="at">times =</span> <span class="fu">length</span>(estimates)),</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">c</span>(<span class="st">"beta_0"</span>, <span class="st">"beta_1"</span>, <span class="st">"beta_2"</span>, <span class="st">"var_param_1"</span>, <span class="st">"var_param_2"</span>, </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                <span class="st">"var_param_3"</span>, <span class="st">"var_param_4"</span>, <span class="st">"log_lik"</span>),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate =</span> estimates,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">Standard.error =</span> std_errs</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Update the estimation_records by joining and updating</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>estimation_records <span class="ot">&lt;-</span> estimation_records <span class="sc">|&gt;</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rows_update</span>(new_estimates, </span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>              <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Model"</span>, <span class="st">"source"</span>, <span class="st">"data.collection"</span>, <span class="st">"Parameter"</span>),</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">unmatched =</span> <span class="st">"ignore"</span>)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="do">## update the date</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>estimation_records <span class="ot">&lt;-</span> estimation_records <span class="sc">|&gt;</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">ifelse</span>(Model <span class="sc">==</span> <span class="st">"iid"</span> <span class="sc">&amp;</span> source <span class="sc">==</span> <span class="st">"cp_spatial"</span> <span class="sc">&amp;</span> </span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>                             data.collection <span class="sc">==</span> <span class="st">"replication"</span>,</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">as.character</span>(<span class="fu">format</span>(<span class="fu">ymd</span>(<span class="fu">today</span>()), <span class="st">"%m/%d/%y"</span>)), date))</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(estimation_records, <span class="at">file =</span> <span class="st">"data/estimates_and_sources.csv"</span>, <span class="at">row.names =</span> F )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="spatial-structure-setup" class="level3">
+<h3 class="anchored" data-anchor-id="spatial-structure-setup">Spatial Structure Setup</h3>
+<section id="set-up-geometry" class="level4">
+<h4 class="anchored" data-anchor-id="set-up-geometry">Set up geometry</h4>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># if using tidycensus-- leaving in case someone wants to do a different analysis with census data</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># state_laea %&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   inner_join(fips_codes %&gt;% select(state, state_code, state_name), </span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#              join_by(GEOID == state_code))</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>wall_sp <span class="ot">=</span> us_states <span class="sc">%&gt;%</span><span class="do">## contains boundaries of contiguous 48 + DC</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(wall_data, <span class="fu">join_by</span>(NAME <span class="sc">==</span> name)) </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="ot">=</span> wall_sp <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(GEOID) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GEOID =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">48</span>, <span class="at">by =</span> <span class="dv">1</span>)) </span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="sc">%&gt;%</span> </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> verbal, <span class="at">label =</span> <span class="st">"a"</span>)) <span class="sc">+</span> <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">name =</span> <span class="st">"Verbal"</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"lightgray"</span>,<span class="st">"gray"</span>, <span class="st">"darkgray"</span>, <span class="st">"black"</span>),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">rescale</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">506</span>, <span class="dv">530</span>, <span class="dv">565</span>, <span class="dv">1000</span>))) <span class="sc">+</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average SAT Verbal Scores for 1999"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="compute-weight-matrix-based-on-geometry" class="level4">
+<h4 class="anchored" data-anchor-id="compute-weight-matrix-based-on-geometry">Compute weight matrix based on geometry</h4>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## vignette("nb_sf")</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>nb_us <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(wall_sp_ordered, <span class="at">queen =</span> <span class="cn">TRUE</span>) <span class="do">### 💅 👑</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#nb_us[] # states are alphabetical, numbered 1-48</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="examine-i.i.d.-residuals-for-spatial-autocorrelation" class="level4">
+<h4 class="anchored" data-anchor-id="examine-i.i.d.-residuals-for-spatial-autocorrelation">Examine i.i.d. residuals for spatial autocorrelation</h4>
+<p>Note: can only use moran’s test on lm resids, not the sar and car.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">moran.test</span>(fit_iid<span class="sc">$</span>residuals, <span class="at">listw =</span> <span class="fu">nb2listw</span>(nb_us, <span class="at">style =</span> <span class="st">"W"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Moran I test under randomisation
+
+data:  fit_iid$residuals  
+weights: nb2listw(nb_us, style = "W")    
+
+Moran I statistic standard deviate = 3.4276, p-value = 0.0003045
+alternative hypothesis: greater
+sample estimates:
+Moran I statistic       Expectation          Variance 
+      0.314518829      -0.021276596       0.009597823 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p-value of &lt;0.001 indicates strong spatial autocorrelation under Moran I test</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="reproduce-sar-model" class="level3">
+<h3 class="anchored" data-anchor-id="reproduce-sar-model">Reproduce SAR model</h3>
+<p>Values from Table 1:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>wall_ests <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Model <span class="sc">==</span> <span class="st">"SAR"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"Parameter"</span>, <span class="st">"Estimate"</span>, <span class="st">"Standard.error"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Parameter      Estimate Standard.error
+1      beta_0      583.7900          4.890
+2      beta_1       -2.4200          0.320
+3      beta_2        0.0183          0.004
+4         rho        0.6000   -2001002.000
+5       range -2001002.0000   -2001002.000
+6 var_param_1      409.2000   -2001002.000
+7 var_param_2 -2001002.0000   -2001002.000
+8     log_lik     -179.9000   -2001002.000</code></pre>
+</div>
+</div>
+<section id="initial-attempt-1" class="level4">
+<h4 class="anchored" data-anchor-id="initial-attempt-1">Initial attempt</h4>
+<p>Note: neither the point estimates nor the standard errors match. Crucially, the log-likelihood is different. WORK ON THIS.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fit_SAR <span class="ot">&lt;-</span> spatialreg<span class="sc">::</span><span class="fu">spautolm</span>(verbal<span class="sc">~</span>perc_elig <span class="sc">+</span> <span class="fu">I</span>(perc_elig<span class="sc">^</span><span class="dv">2</span>), </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">data =</span> wall_sp_ordered, </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">listw =</span> <span class="fu">nb2listw</span>(nb_us, <span class="at">style =</span> <span class="st">"W"</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">family =</span> <span class="st">"SAR"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_SAR) <span class="do">## doesn't match-- weights or code difference like (I suspect) with iid?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call: spatialreg::spautolm(formula = verbal ~ perc_elig + I(perc_elig^2), 
+    data = wall_sp_ordered, listw = nb2listw(nb_us, style = "W"), 
+    family = "SAR")
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-17.8535  -7.8846   1.3722   7.4526  20.3795 
+
+Coefficients: 
+                 Estimate Std. Error  z value  Pr(&gt;|z|)
+(Intercept)    584.766102   5.163588 113.2480 &lt; 2.2e-16
+perc_elig       -2.501822   0.308423  -8.1117 4.441e-16
+I(perc_elig^2)   0.019276   0.004135   4.6616 3.137e-06
+
+Lambda: 0.62138 LR test value: 11.4 p-value: 0.00073457 
+Numerical Hessian standard error of lambda: 0.14513 
+
+Log likelihood: -178.1777 
+ML residual variance (sigma squared): 87.458, (sigma: 9.3519)
+Number of observations: 48 
+Number of parameters estimated: 5 
+AIC: 366.36</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="reproduce-car-model" class="level3">
+<h3 class="anchored" data-anchor-id="reproduce-car-model">Reproduce CAR model</h3>
+<p>Values from Table 1:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>wall_ests <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Model <span class="sc">==</span> <span class="st">"CAR"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"Parameter"</span>, <span class="st">"Estimate"</span>, <span class="st">"Standard.error"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Parameter      Estimate Standard.error
+1      beta_0      584.6300          4.860
+2      beta_1       -2.4800          0.320
+3      beta_2        0.0189          0.004
+4         rho        0.8300   -2001002.000
+5       range -2001002.0000   -2001002.000
+6 var_param_1      408.5000   -2001002.000
+7 var_param_2 -2001002.0000   -2001002.000
+8     log_lik     -180.1000   -2001002.000</code></pre>
+</div>
+</div>
+<section id="initial-attempt-2" class="level4">
+<h4 class="anchored" data-anchor-id="initial-attempt-2">Initial attempt</h4>
+<p>Note: neither the point estimates nor the standard errors match. Crucially, the log-likelihood is different. WORK ON THIS.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fit_CAR <span class="ot">&lt;-</span> spatialreg<span class="sc">::</span><span class="fu">spautolm</span>(verbal<span class="sc">~</span>perc_elig <span class="sc">+</span> <span class="fu">I</span>(perc_elig<span class="sc">^</span><span class="dv">2</span>), </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">data =</span> wall_sp_ordered, </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">listw =</span> <span class="fu">nb2listw</span>(nb_us, <span class="at">style =</span> <span class="st">"W"</span>),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">family =</span> <span class="st">"CAR"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in spatialreg::spautolm(verbal ~ perc_elig + I(perc_elig^2), data =
+wall_sp_ordered, : Non-symmetric spatial weights in CAR model</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">## remind me to discuss the warning</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_CAR) <span class="do">## doesn't match-- weights or code difference like (I suspect) with iid?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call: spatialreg::spautolm(formula = verbal ~ perc_elig + I(perc_elig^2), 
+    data = wall_sp_ordered, listw = nb2listw(nb_us, style = "W"), 
+    family = "CAR")
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-21.19724  -8.00616  -0.19723   6.56291  22.99921 
+
+Coefficients: 
+                 Estimate Std. Error  z value  Pr(&gt;|z|)
+(Intercept)    591.511972   3.944959 149.9412 &lt; 2.2e-16
+perc_elig       -2.982626   0.304222  -9.8041 &lt; 2.2e-16
+I(perc_elig^2)   0.024408   0.003818   6.3928 1.629e-10
+
+Lambda: 0.018844 LR test value: 0.1429 p-value: 0.70542 
+Numerical Hessian standard error of lambda: 0.97714 
+
+Log likelihood: -183.8061 
+ML residual variance (sigma squared): 124.05, (sigma: 11.138)
+Number of observations: 48 
+Number of parameters estimated: 5 
+AIC: 377.61</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="reproduce-exponential-vgm-model" class="level3">
+<h3 class="anchored" data-anchor-id="reproduce-exponential-vgm-model">Reproduce Exponential VGM model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>wall_ests <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Model <span class="sc">==</span> <span class="st">"expo_vg"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"Parameter"</span>, <span class="st">"Estimate"</span>, <span class="st">"Standard.error"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Parameter      Estimate Standard.error
+1      beta_0      583.6400          6.490
+2      beta_1       -2.1900          0.310
+3      beta_2        0.0146          0.004
+4         rho -2001002.0000   -2001002.000
+5       range      490.0000   -2001002.000
+6 var_param_1       11.4000   -2001002.000
+7 var_param_2      148.0000   -2001002.000
+8     log_lik     -177.2000   -2001002.000</code></pre>
+</div>
+</div>
+<section id="initial-attempt-3" class="level4">
+<h4 class="anchored" data-anchor-id="initial-attempt-3">Initial attempt</h4>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## WORK ON THIS (in progress)</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Empirical Variogram</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>fit_exp_vg <span class="ot">=</span> <span class="fu">variogram</span>(verbal <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> perc_elig <span class="sc">+</span> <span class="fu">I</span>(perc_elig<span class="sc">^</span><span class="dv">2</span>), <span class="at">data =</span> wall_sp_ordered)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_exp_vg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       np             dist             gamma            dir.hor     dir.ver 
+ Min.   : 4.00   Min.   :  90.96   Min.   :  4.952   Min.   :0   Min.   :0  
+ 1st Qu.:36.50   1st Qu.: 429.16   1st Qu.: 94.540   1st Qu.:0   1st Qu.:0  
+ Median :46.00   Median : 813.34   Median :108.493   Median :0   Median :0  
+ Mean   :40.47   Mean   : 811.85   Mean   :109.226   Mean   :0   Mean   :0  
+ 3rd Qu.:49.50   3rd Qu.:1186.75   3rd Qu.:122.846   3rd Qu.:0   3rd Qu.:0  
+ Max.   :58.00   Max.   :1561.59   Max.   :201.815   Max.   :0   Max.   :0  
+    id    
+ var1:15  
+          
+          
+          
+          
+          </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_exp_vg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/repro-vg-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>vgm_model <span class="ot">&lt;-</span> <span class="fu">vgm</span>(<span class="at">nugget =</span><span class="dv">500</span>,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">psill =</span> <span class="dv">1000</span>, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">range =</span> <span class="dv">490</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">model =</span> <span class="st">"Exp"</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>vgm_model</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  model psill range
+1   Nug   500     0
+2   Exp  1000   490</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>vgm_fit <span class="ot">=</span> <span class="fu">fit.variogram</span>(fit_exp_vg, vgm_model)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(vgm_fit)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  model    psill    range
+1   Nug   0.0000   0.0000
+2   Exp 138.6515 420.2057</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_exp_vg, vgm_fit, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1800</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">400</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/repro-vg-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>vgm_fit</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  model    psill    range
+1   Nug   0.0000   0.0000
+2   Exp 138.6515 420.2057</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># B0 = nugget</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># B1 = partial sill</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># B2 = range parameter</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+</section>
+<section id="map-the-fitted-values" class="level2">
+<h2 class="anchored" data-anchor-id="map-the-fitted-values">Map the fitted values</h2>
+<section id="iid-model" class="level3">
+<h3 class="anchored" data-anchor-id="iid-model">IID Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># map fitted values</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co"># choropleth of fitted values</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="co"># fitted iid values</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="sc">%&gt;%</span> </span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">fitted.values</span>(fit_iid), <span class="at">label =</span> <span class="st">"a"</span>)) <span class="sc">+</span> <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">name =</span> <span class="st">"Verbal"</span>,</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"lightgray"</span>,<span class="st">"gray"</span>, <span class="st">"darkgray"</span>, <span class="st">"black"</span>),</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">rescale</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">506</span>, <span class="dv">530</span>, <span class="dv">565</span>, <span class="dv">1000</span>))) <span class="sc">+</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"iid Fitted Average SAT Verbal Scores for 1999"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sar-model" class="level3">
+<h3 class="anchored" data-anchor-id="sar-model">SAR Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fitted SAR values</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="sc">%&gt;%</span> </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">fitted.values</span>(fit_SAR), <span class="at">label =</span> <span class="st">"a"</span>)) <span class="sc">+</span> <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">name =</span> <span class="st">"Verbal"</span>,</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"lightgray"</span>,<span class="st">"gray"</span>, <span class="st">"darkgray"</span>, <span class="st">"black"</span>),</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">rescale</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">506</span>, <span class="dv">530</span>, <span class="dv">565</span>, <span class="dv">1000</span>))) <span class="sc">+</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SAR Fitted Average SAT Verbal Scores for 1999"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="car-model" class="level3">
+<h3 class="anchored" data-anchor-id="car-model">CAR Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fitted CAR values</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered <span class="sc">%&gt;%</span> </span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">fitted.values</span>(fit_CAR), <span class="at">label =</span> <span class="st">"a"</span>)) <span class="sc">+</span> <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">name =</span> <span class="st">"Verbal"</span>,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"lightgray"</span>,<span class="st">"gray"</span>, <span class="st">"darkgray"</span>, <span class="st">"black"</span>),</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">rescale</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">506</span>, <span class="dv">530</span>, <span class="dv">565</span>, <span class="dv">1000</span>))) <span class="sc">+</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"CAR Fitted Average SAT Verbal Scores for 1999"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="diagnostic-checks" class="level2">
+<h2 class="anchored" data-anchor-id="diagnostic-checks">Diagnostic Checks</h2>
+<section id="iid-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="iid-model-1">IID Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting residuals vs fitted models</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>iid_fits <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">fitted =</span> <span class="fu">fitted</span>(fit_iid),</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">residuals =</span> <span class="fu">residuals</span>(fit_iid)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> iid_fits, <span class="fu">aes</span>(<span class="at">x =</span> fitted, <span class="at">y =</span> residuals)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sar-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="sar-model-1">SAR Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting residuals vs fitted models</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>SAR_fits <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fitted =</span> <span class="fu">fitted</span>(fit_SAR),</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">residuals =</span> <span class="fu">residuals</span>(fit_SAR)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> SAR_fits, <span class="fu">aes</span>(<span class="at">x =</span> fitted, <span class="at">y =</span> residuals)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="car-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="car-model-1">CAR Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting residuals vs fitted models</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>CAR_fits <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fitted =</span> <span class="fu">fitted</span>(fit_CAR),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">residuals =</span> <span class="fu">residuals</span>(fit_CAR)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> CAR_fits, <span class="fu">aes</span>(<span class="at">x =</span> fitted, <span class="at">y =</span> residuals)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="map-visualization-of-fits" class="level2">
+<h2 class="anchored" data-anchor-id="map-visualization-of-fits">Map Visualization of Fits</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Mason </span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ChatGPT code (needs cleaning) WORK ON THIS</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>nb <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(wall_sp_ordered, <span class="at">queen =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>lw <span class="ot">&lt;-</span> <span class="fu">nb2listw</span>(nb, <span class="at">style =</span> <span class="st">"W"</span>, <span class="at">zero.policy =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="co"># extract lambda (spatial parameter)</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>lambda_hat <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_SAR)[[<span class="st">"lambda"</span>]]</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">is.na</span>(lambda_hat)) lambda_hat <span class="ot">&lt;-</span> fit_SAR<span class="sc">$</span>lambda  <span class="co"># fallback if stored differently</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="co"># residuals (innovations)</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>e_hat <span class="ot">&lt;-</span> <span class="fu">residuals</span>(fit_SAR)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a><span class="co"># convert listw to matrix</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">listw2mat</span>(lw)</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>I <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="fu">nrow</span>(W))</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a><span class="co"># spatially structured component</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>u_hat <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">solve</span>(I <span class="sc">-</span> lambda_hat <span class="sc">*</span> W, e_hat))</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>wall_sp_ordered<span class="sc">$</span>small_scale <span class="ot">&lt;-</span> u_hat</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(wall_sp_ordered) <span class="sc">+</span></span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> small_scale), <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">linewidth =</span> <span class="fl">0.15</span>) <span class="sc">+</span></span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">datum =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(</span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Small-scale</span><span class="sc">\n</span><span class="st">spatial structure"</span>,</span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">low =</span> <span class="st">"white"</span>, <span class="at">mid =</span> <span class="st">"gray"</span>, <span class="at">high =</span> <span class="st">"black"</span>, <span class="at">midpoint =</span> <span class="dv">0</span></span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReproducingWall_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-wall_close_2004" class="csl-entry" role="listitem">
+Wall, Melanie M. 2004. <span>“A Close Look at the Spatial Structure Implied by the <span>CAR</span> and <span>SAR</span> Models.”</span> <em>Journal of Statistical Planning and Inference</em> 121 (2): 311–24. <a href="https://doi.org/10.1016/S0378-3758(03)00111-3">https://doi.org/10.1016/S0378-3758(03)00111-3</a>.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

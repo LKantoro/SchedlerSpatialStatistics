@@ -1,0 +1,53 @@
+﻿name,state,verbal,math,perc_elig
+Alabama,ala,561,555,9
+Alaska,alaska,516,514,50
+Arizona,ariz,524,525,34
+Arkansas,ark,563,556,6
+California,calif,497,514,49
+Colorado,colo,536,540,32
+Connecticut,conn,510,509,80
+Delaware,dela,503,497,67
+District of Columbia,d.c.,494,478,77
+Florida,fla,499,498,53
+Georgia,ga,487,482,63
+Hawaii,hawaii,482,513,52
+Idaho,idaho,542,540,16
+Illinois,ill,569,585,12
+Indiana,ind,496,498,60
+Iowa,iowa,594,598,5
+Kansas,kan,578,576,9
+Kentucky,ky,547,547,12
+Louisiana,la,561,558,8
+Maine,maine,507,503,68
+Maryland,md,507,507,65
+Massachusetts,mass,511,511,78
+Michigan,mich,557,565,11
+Minnesota,minn,586,598,9
+Mississippi,miss,563,548,4
+Missouri,mo,572,572,8
+Montana,mont,545,546,21
+Nebraska,neb,568,571,8
+Nevada,nev,512,517,34
+New Hampshire,nh,520,518,72
+New Jersey,nj,498,510,80
+New Mexico,nm,549,542,12
+New York,ny,495,502,76
+North Carolina,nc,493,493,61
+North Dakota,nd,594,605,5
+Ohio,ohio,534,538,25
+Oklahoma,okla,567,560,8
+Oregon,ore,525,525,53
+Pennsylvania,pa,498,495,70
+Rhode Island,ri,504,499,70
+South Carolina,sc,479,475,61
+South Dakota,sd,585,588,4
+Tennessee,tenn,559,553,13
+Texas,texas,494,499,50
+Utah,utah,570,568,5
+Vermont,vt,514,506,70
+Virginia,va,508,499,65
+Washington,wash,525,526,52
+West Virginia,wva,527,512,18
+Wisconsin,wis,584,595,7
+Wyoming,wyo,546,551,10
+USA,us,505,511,43
