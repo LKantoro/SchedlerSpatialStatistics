@@ -385,15 +385,110 @@ wall_ests |>
 
 Note: neither the point estimates nor the standard errors match. Crucially, the log-likelihood is different. WORK ON THIS.
 
+Note: This is primarily chat code using matrix multiplication using edge/border by using the row-standardizing weights (queen = FAlSE). Then fit Wall's SAR by maximizing her likelihood whihc is the Cov formula she gave in Table 1. Then we try to optimize rho, and finally getting the summary statistics for each Beta, Lambda, an the SE's at rho hat. Better but not exact to Wall's output. Will be debugging soon.
+
 ```{r}
 
 fit_SAR <- spatialreg::spautolm(verbal~perc_elig + I(perc_elig^2), 
                                 data = wall_sp_ordered, 
-                                listw = nb2listw(nb_us, style = "W"),
-                                family = "SAR")
+                                listw = nb2listw(nb_us, style = "W"),                                family = "SAR")
 
 summary(fit_SAR) ## doesn't match-- weights or code difference like (I suspect) with iid?
 
+# IMPORTANT: ensure states are in alphabetical order (matches Wall Appendix A numbering)
+wall_sp_ordered <- us_states %>%
+  inner_join(wall_data, join_by(NAME == name)) %>%
+  arrange(NAME)
+
+# Rook contiguity (edge-sharing only)
+nb_us <- spdep::poly2nb(wall_sp_ordered, queen = FALSE)
+
+# Row-standardized weights W* (rows sum to 1)
+lw_us <- spdep::nb2listw(nb_us, style = "W", zero.policy = TRUE)
+
+W <- spdep::listw2mat(lw_us)
+wi_plus <- sapply(nb_us, length)
+D <- diag(1 / wi_plus)  # diag(1/wi+), used by Wall
+
+sar_profile_loglik <- function(rho, y, X, W, D) {
+  n <- length(y)
+  I <- diag(n)
+  A <- I - rho * W
+
+  # Guard against non-invertible A
+  detA <- determinant(A, logarithm = TRUE)
+  if (!is.finite(detA$modulus)) return(-Inf)
+
+  Ainv <- solve(A)
+  V <- Ainv %*% D %*% t(Ainv)          # Cov = lambda^2 * V
+  Vinv <- solve(V)
+
+  # GLS beta-hat given rho
+  XtVinvX <- t(X) %*% Vinv %*% X
+  beta_hat <- solve(XtVinvX, t(X) %*% Vinv %*% y)
+
+  e <- y - X %*% beta_hat
+
+  # MLE lambda^2 (divide by n, not n-p)
+  lam2_hat <- drop(t(e) %*% Vinv %*% e) / n
+
+  # profile logLik
+  logdetV <- as.numeric(determinant(V, logarithm = TRUE)$modulus)
+  ll <- -0.5 * (n * log(2*pi) + n * log(lam2_hat) + logdetV + n)
+
+  ll
+}
+
+y <- wall_sp_ordered$verbal
+X <- model.matrix(~ perc_elig + I(perc_elig^2), data = wall_sp_ordered)
+
+opt <- optimize(
+  sar_profile_loglik,
+  interval = c(-1.392, 0.999),  # Wall’s US-lattice bounds
+  maximum = TRUE,
+  y = y, X = X, W = W, D = D
+)
+
+rho_hat <- opt$maximum
+ll_hat  <- opt$objective
+rho_hat
+ll_hat
+
+sar_fit_at_rho <- function(rho, y, X, W, D) {
+  n <- length(y)
+  I <- diag(n)
+  A <- I - rho * W
+  Ainv <- solve(A)
+
+  V <- Ainv %*% D %*% t(Ainv)
+  Vinv <- solve(V)
+
+  XtVinvX <- t(X) %*% Vinv %*% X
+  beta_hat <- solve(XtVinvX, t(X) %*% Vinv %*% y)
+
+  e <- y - X %*% beta_hat
+  lam2_hat <- drop(t(e) %*% Vinv %*% e) / n  # MLE
+
+  # MLE SEs for betas
+  Vbeta <- lam2_hat * solve(XtVinvX)
+  se_beta <- sqrt(diag(Vbeta))
+
+  list(beta = drop(beta_hat), se_beta = se_beta, lam2 = lam2_hat)
+}
+
+fit <- sar_fit_at_rho(rho_hat, y, X, W, D)
+
+beta_hat <- fit$beta
+se_beta  <- fit$se_beta
+lam2_hat <- fit$lam2
+
+# Format like Wall table (2 sig figs, then force decimals if you want)
+beta_table <- data.frame(
+  Estimate = beta_hat,
+  SE = sprintf("%.3f", se_beta)  # Wall shows ~2 decimals for SEs in Table 1
+)
+beta_table
+lam2_hat
 ```
 
 ### Reproduce CAR model
