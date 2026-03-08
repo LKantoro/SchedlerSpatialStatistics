@@ -73,12 +73,6 @@ wall_data <-
 
 ## Visualize the data non-spatially
 
-```{r}
-## Replicate fig 1
-## histograms of each variable
-## scatterplots 
-
-```
 
 ```{r}
 # Figure 1 - Alejandro Gomez
@@ -310,36 +304,22 @@ WORK ON THIS: Need to add in mean square error (currently is NA, should be a val
 ## add some code to verify the match
 ## FIXME ###
 
-estimates <- c(fit_iid$coefficients, NA, NA, mle_sigma_sq, NA, logLik(fit_iid) 
-)
-std_errs <- c(se_betas_wall, rep(-212, times = 5)) ## no se estimates for other params
+fit_iid <- lm(verbal ~ perc_elig + I(perc_elig^2), data = wall_data)
 
-## write the estimates to file:
-## Create a data frame with the new estimates
-new_estimates <- data.frame(
-  date = rep(format(today(), "%m/%d/%y"), times = length(estimates)),
-  Model = rep("iid", times = length(estimates)),
-  source = rep("cp_spatial", times = length(estimates)),
-  data.collection = rep("replication", times = length(estimates)),
-  Parameter = c("beta_0", "beta_1", "beta_2", "var_param_1", "var_param_2", 
-                "var_param_3", "var_param_4", "log_lik"),
-  Estimate = estimates,
-  Standard.error = std_errs
+# MLE SEs (Wall style)
+n <- nobs(fit_iid)
+p <- length(coef(fit_iid))
+se_wall <- sqrt(diag(vcov(fit_iid) * ((n - p)/n)))
+
+# Format for table
+std_errs <- sprintf("%.3f", signif(se_wall, 2))
+
+iid_results <- data.frame(
+  Estimate = coef(fit_iid),
+  Std_Error = std_errs
 )
 
-## Update the estimation_records by joining and updating
-estimation_records <- estimation_records |>
-  rows_update(new_estimates, 
-              by = c("Model", "source", "data.collection", "Parameter"),
-              unmatched = "ignore")
-
-## update the date
-estimation_records <- estimation_records |>
-  mutate(date = ifelse(Model == "iid" & source == "cp_spatial" & 
-                             data.collection == "replication",
-                              as.character(format(ymd(today()), "%m/%d/%y")), date))
-
-write.csv(estimation_records, file = "data/estimates_and_sources.csv", row.names = F )
+iid_results
 ```
 
 ### Spatial Structure Setup
