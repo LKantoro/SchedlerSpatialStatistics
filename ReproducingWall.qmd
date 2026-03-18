@@ -340,13 +340,14 @@ wall_sp_ordered = wall_sp %>% arrange(GEOID) %>%
   mutate(GEOID = seq(from = 1, to = 48, by = 1)) 
 
 
-wall_sp_ordered %>% 
-  ggplot(aes(fill = verbal, label = "a")) + geom_sf() +
-  scale_fill_gradientn(name = "Verbal",
-    colors = c("white", "lightgray","gray", "darkgray", "black"),
-    values = rescale(c(0, 506, 530, 565, 1000))) +
+wall_sp_ordered %>%  
+  ggplot(aes(fill = verbal, label = "a")) + 
+  geom_sf() + 
+  scale_fill_stepsn(
+    name = "variable",
+    colours = c("white", "lightgray", "darkgray", "black"),
+    breaks = c(506, 530, 565, 1000)) +
   labs(title = "Average SAT Verbal Scores for 1999")
-
 ```
 
 #### Compute weight matrix based on geometry
@@ -602,9 +603,10 @@ wall_sp_ordered %>%
 
 wall_sp_ordered %>% 
   ggplot(aes(fill = fitted.values(fit_SAR), label = "a")) + geom_sf() +
-  scale_fill_gradientn(name = "Verbal",
-    colors = c("white", "lightgray","gray", "darkgray", "black"),
-    values = rescale(c(0, 506, 530, 565, 1000))) +
+  scale_fill_stepsn(
+    name = "variable",
+    colours = c("white", "lightgray", "darkgray", "black"),
+    breaks = c(506, 530, 565, 1000)) +
   labs(title = "SAR Fitted Average SAT Verbal Scores for 1999")
 ```
 
@@ -618,9 +620,10 @@ wall_sp_ordered %>%
 
 wall_sp_ordered %>% 
   ggplot(aes(fill = fitted.values(fit_CAR), label = "a")) + geom_sf() +
-  scale_fill_gradientn(name = "Verbal",
-    colors = c("white", "lightgray","gray", "darkgray", "black"),
-    values = rescale(c(0, 506, 530, 565, 1000))) +
+  scale_fill_stepsn(
+    name = "variable",
+    colours = c("white", "lightgray", "darkgray", "black"),
+    breaks = c(506, 530, 565, 1000)) +
   labs(title = "CAR Fitted Average SAT Verbal Scores for 1999")
 ```
 
