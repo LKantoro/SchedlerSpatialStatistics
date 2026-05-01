@@ -1,0 +1,223 @@
+---
+title: "Poster figure -- Wall Table 1 reproduction (Student L)"
+format: html
+---
+
+You're filling in the **comparison of Table 1 from Wall (2004)** with the
+queen-contiguity replication. The poster comment asks for a side-by-side
+comparison of the IID, SAR, and CAR fits. Student C will then add the
+Hausdorff-weight versions to the same table.
+
+The `ReplicatingWall.qmd` file already fits all three models -- your job
+is to assemble the comparison table and a short visual.
+
+## Setup (same as the replication file)
+
+```{r}
+#| message: false
+library(sf)
+library(spatialreg)   # brings in `us_states` from spData; provides spautolm
+library(dplyr)
+library(ggplot2)
+library(spdep)
+library(tibble)
+library(tidyr)
+library(patchwork)
+library(janitor)
+```
+
+## Read data + set up geometry + queen weights (copied from the replication file)
+
+```{r}
+wall_data <- read.csv("data/wall_2004_dataset.csv")
+
+wall_data <- wall_data %>%
+  filter(!(name %in% c("District of Columbia", "Alaska", "Hawaii", "USA")))
+
+wall_data$perc_elig_2 <- wall_data$perc_elig^2
+
+wall_sp <- us_states %>%
+  inner_join(wall_data, join_by(NAME == name))
+
+wall_sp_ordered <- wall_sp %>% arrange(GEOID) %>%
+  mutate(GEOID = seq(from = 1, to = 48, by = 1))
+
+# queen-contiguity weights -- Wall's original spec
+nb_us <- poly2nb(wall_sp_ordered, queen = TRUE)
+lw_queen <- nb2listw(nb_us, style = "W")
+```
+
+## Fit the three models (copied from the replication file)
+
+```{r}
+fit_iid <- lm(verbal ~ perc_elig + perc_elig_2, data = wall_data)
+
+summary(fit_iid)
+
+fit_SAR <- spautolm(verbal ~ perc_elig + perc_elig_2,
+                    data   = wall_sp_ordered,
+                    listw  = lw_queen,
+                    family = "SAR")
+summary(fit_SAR)
+fit_CAR <- spautolm(verbal ~ perc_elig + perc_elig_2,
+                    data   = wall_sp_ordered,
+                    listw  = lw_queen,
+                    family = "CAR")
+
+summary(fit_CAR)
+```
+
+## YOUR TASK 1 -- assemble the comparison table
+
+We want one row per model with columns: `intercept`, `perc_elig`,
+`perc_elig_2`, `spatial_param` (lambda for SAR/CAR, NA for IID), and
+`logLik`.
+
+```{r}
+# Helper to pull the right pieces out of a fit.
+extract_row <- function(model_name, fit) {
+  if (inherits(fit, "lm")) {
+    cf <- coef(fit)
+    spatial <- NA_real_
+  } else {
+    # spautolm objects: coef() returns spatial param + betas
+    cf_full <- coef(fit)
+    spatial <- cf_full["lambda"]   # SAR / CAR spatial parameter
+    cf <- cf_full[c("(Intercept)", "perc_elig", "perc_elig_2")]
+  }
+  
+  print(cf)
+  tibble(
+    Model         = model_name,
+    intercept     = cf["(Intercept)"],
+    perc_elig     = cf["perc_elig"],
+    perc_elig_2   = cf["perc_elig_2"],
+    spatial_param = as.numeric(spatial),
+    logLik        = as.numeric(logLik(fit))
+  )
+}
+
+# TODO: build `comparison_tbl` by binding the three rows together.
+#   Use bind_rows() and call extract_row() once per fit.
+#   Order: IID, SAR, CAR.
+
+comparison_tbl_iid <- extract_row(model_name = "iid", fit = fit_iid)
+
+comparison_tbl_SAR <- extract_row(model_name = "SAR", fit = fit_SAR)
+
+comparison_tbl_CAR <- extract_row(model_name = "CAR", fit = fit_CAR)
+
+comparison_tbl = bind_rows(comparison_tbl_iid, comparison_tbl_SAR, comparison_tbl_CAR)
+
+comparison_tbl %>% rename("Model" = Model, 
+                          "Intercept" = intercept, 
+                          "Beta1" = perc_elig, 
+                          "Beta2" = perc_elig_2, 
+                          "Spatial Parameter" = spatial_param,
+                          "Log likelihood" = logLik) %>% 
+  t() %>% 
+  data.frame() %>% 
+  row_to_names(row_number = 1)
+
+
+
+```
+
+## YOUR TASK 2 -- save it for student C to extend
+
+C will read this back in and append two more rows (SAR + CAR with Hausdorff
+weights). Don't change the column names or the file path.
+
+```{r}
+#saveRDS(comparison_tbl, "data/queen_fits_table.rds")
+```
+
+## YOUR TASK 3 -- a small comparison visualization
+
+A helpful poster visual is a bar chart of `logLik` across the three models,
+since better-fitting spatial models should give a higher log-likelihood than
+the IID baseline. The IID bar gives the visual baseline.
+
+```{r}
+#TODO: bar chart of logLik by Model.
+
+ggplot(comparison_tbl, aes(x = Model, y = logLik, fill = Model)) + 
+  geom_col(width = 0.6) + 
+  geom_text(aes(label = round(logLik, 1)), vjust = 1.4, size = 3) + 
+  labs(title = "Log-likelihood by model (queen contiguity)",
+     x = NULL, y = "log L") + 
+  theme_minimal() + theme(legend.position = "none")
+#
+  
+#Save as p_loglik.
+
+p_loglik <- ggplot(comparison_tbl, aes(x = Model, y = logLik, fill = Model))
+  # TODO
+```
+
+## YOUR TASK 4 -- map the SAR fitted values
+
+Pair the bar chart with the spatial fitted values from the SAR model so the
+poster reader sees both the numerical and the spatial story.
+
+```{r}
+wall_sp_ordered$.fitted_sar <- fitted(fit_SAR)
+
+# TODO: choropleth of .fitted_sar.
+
+
+ggplot(wall_sp_ordered, aes(fill = .fitted_sar)) +
+  geom_sf() +
+  scale_fill_gradientn(
+    colours = grey.colors(4, start = 0.9, end = 0),
+    breaks = c(0, 506, 530, 565),
+    name = "Verbal SAT") +
+  labs(title = "SAR fitted values (queen contiguity)") +
+  theme_minimal()
+
+# Save as p_map.
+
+p_map <- ggplot(wall_sp_ordered, aes(fill = .fitted_sar)) +
+  geom_sf()
+  # TODO
+```
+
+## Combine and save
+
+```{r}
+panel <- (p_loglik | p_map) +
+  plot_annotation(
+    title = "Wall (2004) Table 1 -- queen-contiguity replication",
+    theme = theme(plot.title = element_text(face = "bold", size = 14))
+  )
+
+panel
+
+ggsave("figures/wall_queen_comparison.png",
+       panel, width = 11, height = 5, dpi = 200, bg = "white")
+```
+
+## Stretch -- side-by-side residual maps
+
+If you have time: replicate `wall_sp_ordered` with three columns
+(`.resid_iid`, `.resid_sar`, `.resid_car`), pivot longer, and facet by
+model:
+
+```{r}
+#| eval: false
+wall_sp_ordered$.resid_iid <- residuals(fit_iid)
+wall_sp_ordered$.resid_sar <- residuals(fit_SAR)
+wall_sp_ordered$.resid_car <- residuals(fit_CAR)
+
+resid_long <- wall_sp_ordered %>%
+  pivot_longer(starts_with(".resid_"),
+               names_to = "model", values_to = "resid",
+               names_prefix = "\\.resid_")
+
+ggplot(resid_long) +
+  geom_sf(aes(fill = resid)) +
+  scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#b2182b",
+                       midpoint = 0, name = "Residual") +
+  facet_wrap(~ model, ncol = 3) +
+  theme_minimal()
+```
